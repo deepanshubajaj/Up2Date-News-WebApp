@@ -1,0 +1,38 @@
+.footer {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  font-size: 1.5rem;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.icon:hover {
+  color: #007bff;
+}
+
+.copyright {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.copyright-icon {
+  font-size: 0.9rem;
+} 
