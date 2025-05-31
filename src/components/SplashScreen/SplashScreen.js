@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { IoPlayCircleOutline } from "react-icons/io5";
+
 import newsVideo from '../../SplashScreenAssets/newsVideo.mp4';
 import newsAudio from '../../SplashScreenAssets/news_audio.mp3';
 
@@ -44,54 +45,21 @@ const Video = styled.video`
   transition: opacity 0.3s ease;
 `;
 
-const PlayButton = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 20px 40px;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.8);
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-
-  svg {
-    width: 64px;
-    height: 64px;
-  }
-`;
-
-const PlayText = styled.div`
-  font-size: 18px;
-  font-weight: 500;
-`;
-
 function SplashScreen({ onComplete }) {
   const [isVisible, setIsVisible] = useState(true);
   const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const video = document.getElementById('splashVideo');
 
     const handleVideoEnd = () => {
       setIsVisible(false);
-      if (onComplete) onComplete();
+      onComplete?.();
     };
 
     const handleVideoError = (e) => {
       console.error('Video error:', e);
-      setError('Video error: ' + (e.message || 'Unknown error'));
     };
 
     video.addEventListener('ended', handleVideoEnd);
@@ -106,34 +74,43 @@ function SplashScreen({ onComplete }) {
   const handleStart = async () => {
     if (!isWaitingForPlay) return;
 
-    try {
-      const video = document.getElementById('splashVideo');
-      const audio = new Audio(newsAudio);
-      
-      // Start playing both
-      await Promise.all([video.play(), audio.play()]);
-      
-      setIsWaitingForPlay(false);
-      setIsPlaying(true);
+    const video = document.getElementById('splashVideo');
+    const audio = new Audio(newsAudio);
 
-      // Set timer to end splash screen after 5 seconds
+    try {
+      // iOS requires video to be muted on first play
+      video.muted = true;
+
+      await video.play();
+
+      // Unmute after successful playback begins
+      video.muted = false;
+
+      // Play audio in parallel
+      await audio.play().catch(err =>
+        console.warn('Audio play may be blocked on iOS:', err)
+      );
+
+      setIsPlaying(true);
+      setIsWaitingForPlay(false);
+
       setTimeout(() => {
         setIsVisible(false);
         video.pause();
         audio.pause();
-        if (onComplete) onComplete();
+        onComplete?.();
       }, 5000);
-
-    } catch (error) {
-      console.error('Error playing media:', error);
+    } catch (err) {
+      console.error('Error starting video/audio:', err);
     }
   };
 
   return (
-    <SplashContainer 
-      isVisible={isVisible} 
+    <SplashContainer
+      isVisible={isVisible}
       isWaitingForPlay={isWaitingForPlay}
       onClick={handleStart}
+      onTouchStart={handleStart} // ensure iOS triggers this too
     >
       <StartMessage show={isWaitingForPlay}>
         Tap anywhere to start
@@ -141,9 +118,9 @@ function SplashScreen({ onComplete }) {
       <Video
         id="splashVideo"
         playsInline
-        muted={false}
-        isPlaying={isPlaying}
+        muted // Required for initial autoplay on iOS
         loop
+        isPlaying={isPlaying}
       >
         <source src={newsVideo} type="video/mp4" />
         Your browser does not support the video tag.
