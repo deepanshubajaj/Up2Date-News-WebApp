@@ -22,27 +22,36 @@ const SplashContainer = styled.div`
   align-items: center;
   cursor: ${({ isWaitingForPlay }) => (isWaitingForPlay ? "pointer" : "default")};
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const StartMessage = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   color: white;
   font-size: 24px;
   font-weight: 500;
   text-align: center;
-  margin-top: 20px;
   animation: ${fadeInOut} 2s ease-in-out infinite;
   white-space: nowrap;
+  z-index: 2;
 `;
 
 const GifImage = styled.img`
-  max-width: 100%;
-  max-height: 80vh;
-  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 function SplashScreenMobile({ onComplete }) {
   const [isVisible, setIsVisible] = useState(true);
   const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
+  const [showGif, setShowGif] = useState(false);
 
   const handleStart = async () => {
     if (!isWaitingForPlay) return;
@@ -52,6 +61,7 @@ function SplashScreenMobile({ onComplete }) {
       await audio.play();
 
       setIsWaitingForPlay(false);
+      setShowGif(true);
 
       setTimeout(() => {
         setIsVisible(false);
@@ -64,8 +74,12 @@ function SplashScreenMobile({ onComplete }) {
   };
 
   return (
-    <SplashContainer isVisible={isVisible} isWaitingForPlay={isWaitingForPlay} onClick={handleStart}>
-      <GifImage src={phoneNewsGif} alt="Loading animation" />
+    <SplashContainer
+      isVisible={isVisible}
+      isWaitingForPlay={isWaitingForPlay}
+      onClick={handleStart}
+    >
+      {showGif && <GifImage src={phoneNewsGif} alt="Loading animation" />}
       {isWaitingForPlay && <StartMessage>Tap anywhere to start</StartMessage>}
     </SplashContainer>
   );
