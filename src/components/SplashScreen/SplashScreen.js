@@ -47,37 +47,6 @@ const Video = styled.video`
   transition: opacity 0.3s ease;
 `;
 
-const PlayButton = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 20px 40px;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.8);
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-
-  svg {
-    width: 64px;
-    height: 64px;
-  }
-`;
-
-const PlayText = styled.div`
-  font-size: 18px;
-  font-weight: 500;
-`;
-
 function SplashScreen({ onComplete }) {
   const [isVisible, setIsVisible] = useState(true);
   const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
@@ -85,10 +54,8 @@ function SplashScreen({ onComplete }) {
   const [error, setError] = useState(null);
   const [videoSrc, setVideoSrc] = useState(newsVideoDesktop); // default
 
-  // Better mobile detection
   useLayoutEffect(() => {
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) &&
-      ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     console.log('Detected mobile:', isMobile, 'UserAgent:', navigator.userAgent);
     setVideoSrc(isMobile ? newsVideoMobile : newsVideoDesktop);
   }, []);
@@ -126,12 +93,18 @@ function SplashScreen({ onComplete }) {
       const video = document.getElementById('splashVideo');
       const audio = new Audio(newsAudio);
 
-      // Play video first (muted), then try audio
-      await video.play();
+      if (video) {
+        video.load(); // force load source
+        const playPromise = video.play();
 
-      // Try to play audio after video starts
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
+      }
+
+      // Try playing audio (may fail silently on mobile)
       audio.play().catch(err => {
-        console.warn('Audio play failed, maybe blocked by browser:', err);
+        console.warn('Audio play blocked or failed:', err.message);
       });
 
       setIsWaitingForPlay(false);
@@ -143,12 +116,11 @@ function SplashScreen({ onComplete }) {
         audio.pause();
         if (onComplete) onComplete();
       }, 5000);
-
     } catch (error) {
-      console.error('Error playing media:', error);
+      console.error('Playback error:', error);
+      setError('Could not play media: ' + error.message);
     }
   };
-
 
   return (
     <SplashContainer
@@ -160,10 +132,10 @@ function SplashScreen({ onComplete }) {
         Tap anywhere to start
       </StartMessage>
       <Video
-        key={videoSrc} // force re-render when src changes
+        key={videoSrc}
         id="splashVideo"
         playsInline
-        muted
+        muted // Crucial for mobile playback
         isPlaying={isPlaying}
         loop
       >
