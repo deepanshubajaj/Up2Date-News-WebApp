@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { IoPlayCircleOutline } from 'react-icons/io5';
-
-import newsVideoDesktop from '../../SplashScreenAssets/newsVideo.mp4';
-import newsVideoMobile from '../../SplashScreenAssets/phone-news-video.mp4';
+import React, { useEffect, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { IoPlayCircleOutline } from "react-icons/io5";
+import newsVideo from '../../SplashScreenAssets/newsVideo.mp4';
 import newsAudio from '../../SplashScreenAssets/news_audio.mp3';
+
+const fadeInOut = keyframes`
+  0% { opacity: 0; transform: translate(-50%, -50%) translateY(10px); }
+  50% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(-10px); }
+`;
 
 const SplashContainer = styled.div`
   position: fixed;
@@ -15,7 +19,29 @@ const SplashContainer = styled.div`
   z-index: 10000;
   background: #000;
   display: ${({ isVisible }) => (isVisible ? 'block' : 'none')};
-  cursor: pointer;
+  cursor: ${({ isWaitingForPlay }) => (isWaitingForPlay ? 'pointer' : 'default')};
+`;
+
+const StartMessage = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 24px;
+  font-weight: 500;
+  text-align: center;
+  animation: ${fadeInOut} 2s ease-in-out infinite;
+  display: ${({ show }) => (show ? 'block' : 'none')};
+  white-space: nowrap;
+`;
+
+const Video = styled.video`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: ${({ isPlaying }) => (isPlaying ? 1 : 0)};
+  transition: opacity 0.3s ease;
 `;
 
 const PlayButton = styled.div`
@@ -24,61 +50,102 @@ const PlayButton = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  font-size: 24px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  gap: 15px;
   background: rgba(0, 0, 0, 0.7);
-  padding: 20px;
+  padding: 20px 40px;
   border-radius: 12px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+
+  svg {
+    width: 64px;
+    height: 64px;
+  }
 `;
 
-const Video = styled.video`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: ${({ isPlaying }) => (isPlaying ? 'block' : 'none')};
+const PlayText = styled.div`
+  font-size: 18px;
+  font-weight: 500;
 `;
 
 function SplashScreen({ onComplete }) {
   const [isVisible, setIsVisible] = useState(true);
+  const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [videoSrc, setVideoSrc] = useState(newsVideoDesktop);
+  const [error, setError] = useState(null);
 
-  const handleStart = () => {
+  useEffect(() => {
     const video = document.getElementById('splashVideo');
-    const audio = new Audio(newsAudio);
 
-    video.play().then(() => {
-      audio.play().catch(err => console.warn('Audio play failed:', err));
+    const handleVideoEnd = () => {
+      setIsVisible(false);
+      if (onComplete) onComplete();
+    };
+
+    const handleVideoError = (e) => {
+      console.error('Video error:', e);
+      setError('Video error: ' + (e.message || 'Unknown error'));
+    };
+
+    video.addEventListener('ended', handleVideoEnd);
+    video.addEventListener('error', handleVideoError);
+
+    return () => {
+      video.removeEventListener('ended', handleVideoEnd);
+      video.removeEventListener('error', handleVideoError);
+    };
+  }, [onComplete]);
+
+  const handleStart = async () => {
+    if (!isWaitingForPlay) return;
+
+    try {
+      const video = document.getElementById('splashVideo');
+      const audio = new Audio(newsAudio);
+      
+      // Start playing both
+      await Promise.all([video.play(), audio.play()]);
+      
+      setIsWaitingForPlay(false);
       setIsPlaying(true);
+
+      // Set timer to end splash screen after 5 seconds
       setTimeout(() => {
         setIsVisible(false);
         video.pause();
         audio.pause();
         if (onComplete) onComplete();
       }, 5000);
-    }).catch(err => console.error('Video play failed:', err));
+
+    } catch (error) {
+      console.error('Error playing media:', error);
+    }
   };
 
   return (
-    <SplashContainer isVisible={isVisible} onClick={handleStart}>
-      {!isPlaying && (
-        <PlayButton>
-          <IoPlayCircleOutline size={48} />
-          Tap to Start
-        </PlayButton>
-      )}
+    <SplashContainer 
+      isVisible={isVisible} 
+      isWaitingForPlay={isWaitingForPlay}
+      onClick={handleStart}
+    >
+      <StartMessage show={isWaitingForPlay}>
+        Tap anywhere to start
+      </StartMessage>
       <Video
         id="splashVideo"
         playsInline
-        muted
-        loop
+        muted={false}
         isPlaying={isPlaying}
-        key={videoSrc}
+        loop
       >
-        <source src={videoSrc} type="video/mp4" />
+        <source src={newsVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </Video>
     </SplashContainer>
