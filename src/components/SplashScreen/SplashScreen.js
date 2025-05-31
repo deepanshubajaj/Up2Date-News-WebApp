@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { IoPlayCircleOutline } from "react-icons/io5";
 
@@ -85,8 +85,10 @@ function SplashScreen({ onComplete }) {
   const [error, setError] = useState(null);
   const [videoSrc, setVideoSrc] = useState(newsVideoDesktop); // default
 
-  useEffect(() => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  // Better mobile detection
+  useLayoutEffect(() => {
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) &&
+                     ('ontouchstart' in window || navigator.maxTouchPoints > 0);
     console.log('Detected mobile:', isMobile, 'UserAgent:', navigator.userAgent);
     setVideoSrc(isMobile ? newsVideoMobile : newsVideoDesktop);
   }, []);
@@ -104,12 +106,16 @@ function SplashScreen({ onComplete }) {
       setError('Video error: ' + (e.message || 'Unknown error'));
     };
 
-    video.addEventListener('ended', handleVideoEnd);
-    video.addEventListener('error', handleVideoError);
+    if (video) {
+      video.addEventListener('ended', handleVideoEnd);
+      video.addEventListener('error', handleVideoError);
+    }
 
     return () => {
-      video.removeEventListener('ended', handleVideoEnd);
-      video.removeEventListener('error', handleVideoError);
+      if (video) {
+        video.removeEventListener('ended', handleVideoEnd);
+        video.removeEventListener('error', handleVideoError);
+      }
     };
   }, [onComplete]);
 
@@ -120,13 +126,11 @@ function SplashScreen({ onComplete }) {
       const video = document.getElementById('splashVideo');
       const audio = new Audio(newsAudio);
 
-      // Start playing both
       await Promise.all([video.play(), audio.play()]);
 
       setIsWaitingForPlay(false);
       setIsPlaying(true);
 
-      // Set timer to end splash screen after 5 seconds
       setTimeout(() => {
         setIsVisible(false);
         video.pause();
@@ -149,6 +153,7 @@ function SplashScreen({ onComplete }) {
         Tap anywhere to start
       </StartMessage>
       <Video
+        key={videoSrc} // force re-render when src changes
         id="splashVideo"
         playsInline
         muted={false}
