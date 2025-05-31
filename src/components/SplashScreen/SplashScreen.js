@@ -144,12 +144,14 @@ function SplashScreen({ onComplete }) {
         Tap anywhere to start
       </StartMessage>
       <Video
-        id="splashVideo"
-        playsInline
-        muted={false}
-        isPlaying={isPlaying}
-        loop
-      >
+  id="splashVideo"
+  playsInline
+  muted
+  preload="auto"
+  isPlaying={isPlaying}
+  loop
+>
+
         <source src={videoSource} type="video/mp4" />
         Your browser does not support the video tag.
       </Video>
