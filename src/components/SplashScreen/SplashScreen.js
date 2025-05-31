@@ -109,10 +109,10 @@ function SplashScreen({ onComplete }) {
     try {
       const video = document.getElementById('splashVideo');
       const audio = new Audio(newsAudio);
-      
+
       // Start playing both
       await Promise.all([video.play(), audio.play()]);
-      
+
       setIsWaitingForPlay(false);
       setIsPlaying(true);
 
@@ -130,8 +130,8 @@ function SplashScreen({ onComplete }) {
   };
 
   return (
-    <SplashContainer 
-      isVisible={isVisible} 
+    <SplashContainer
+      isVisible={isVisible}
       isWaitingForPlay={isWaitingForPlay}
       onClick={handleStart}
     >

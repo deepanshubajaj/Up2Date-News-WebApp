@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import NavBar from "./components/NavBar/NavBar";
 import News from "./components/News/News";
@@ -11,9 +11,9 @@ import Footer from "./components/Footer";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
-    const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-     useEffect(() => {
+  useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -31,7 +31,7 @@ function App() {
   return (
     <>
       {showSplash ? (
-        isMobile ? (                     
+        isMobile ? (
           <SplashScreenMobile onComplete={handleSplashComplete} />
         ) : (
           <SplashScreen onComplete={handleSplashComplete} />

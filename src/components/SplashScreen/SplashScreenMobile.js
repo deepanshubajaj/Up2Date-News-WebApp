@@ -49,40 +49,40 @@ const GifImage = styled.img`
 `;
 
 function SplashScreenMobile({ onComplete }) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
-  const [showGif, setShowGif] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
+    const [showGif, setShowGif] = useState(false);
 
-  const handleStart = async () => {
-    if (!isWaitingForPlay) return;
+    const handleStart = async () => {
+        if (!isWaitingForPlay) return;
 
-    try {
-      const audio = new Audio(newsAudio);
-      await audio.play();
+        try {
+            const audio = new Audio(newsAudio);
+            await audio.play();
 
-      setIsWaitingForPlay(false);
-      setShowGif(true);
+            setIsWaitingForPlay(false);
+            setShowGif(true);
 
-      setTimeout(() => {
-        setIsVisible(false);
-        audio.pause();
-        if (onComplete) onComplete();
-      }, 5000);
-    } catch (error) {
-      console.error("Error playing audio:", error);
-    }
-  };
+            setTimeout(() => {
+                setIsVisible(false);
+                audio.pause();
+                if (onComplete) onComplete();
+            }, 5000);
+        } catch (error) {
+            console.error("Error playing audio:", error);
+        }
+    };
 
-  return (
-    <SplashContainer
-      isVisible={isVisible}
-      isWaitingForPlay={isWaitingForPlay}
-      onClick={handleStart}
-    >
-      {showGif && <GifImage src={phoneNewsGif} alt="Loading animation" />}
-      {isWaitingForPlay && <StartMessage>Tap anywhere to start</StartMessage>}
-    </SplashContainer>
-  );
+    return (
+        <SplashContainer
+            isVisible={isVisible}
+            isWaitingForPlay={isWaitingForPlay}
+            onClick={handleStart}
+        >
+            {showGif && <GifImage src={phoneNewsGif} alt="Loading animation" />}
+            {isWaitingForPlay && <StartMessage>Tap anywhere to start</StartMessage>}
+        </SplashContainer>
+    );
 }
 
 export default SplashScreenMobile;
