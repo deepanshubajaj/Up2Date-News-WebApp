@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { IoPlayCircleOutline } from "react-icons/io5";
 import newsVideo from '../../SplashScreenAssets/newsVideo.mp4';
 import newsAudio from '../../SplashScreenAssets/news_audio.mp3';
-import newsVideoMobile from '../../SplashScreenAssets/phoneSize-news-video.mp4';
+import newsVideoMobile from '../../SplashScreenAssets/phone-news-video.mp4';
 
 const fadeInOut = keyframes`
   0% { opacity: 0; transform: translate(-50%, -50%) translateY(10px); }
