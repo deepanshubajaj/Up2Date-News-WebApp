@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { IoPlayCircleOutline } from "react-icons/io5";
-import newsVideo from '../../SplashScreenAssets/newsVideo.mp4';
+
+// Import both video versions
+import newsVideoDesktop from '../../SplashScreenAssets/newsVideo.mp4';
+import newsVideoMobile from '../../SplashScreenAssets/phone-news-video.mp4';
 import newsAudio from '../../SplashScreenAssets/news_audio.mp3';
 
 const fadeInOut = keyframes`
@@ -80,6 +83,12 @@ function SplashScreen({ onComplete }) {
   const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState(null);
+  const [videoSrc, setVideoSrc] = useState(newsVideoDesktop); // default
+
+  useEffect(() => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    setVideoSrc(isMobile ? newsVideoMobile : newsVideoDesktop);
+  }, []);
 
   useEffect(() => {
     const video = document.getElementById('splashVideo');
@@ -109,10 +118,10 @@ function SplashScreen({ onComplete }) {
     try {
       const video = document.getElementById('splashVideo');
       const audio = new Audio(newsAudio);
-      
+
       // Start playing both
       await Promise.all([video.play(), audio.play()]);
-      
+
       setIsWaitingForPlay(false);
       setIsPlaying(true);
 
@@ -130,8 +139,8 @@ function SplashScreen({ onComplete }) {
   };
 
   return (
-    <SplashContainer 
-      isVisible={isVisible} 
+    <SplashContainer
+      isVisible={isVisible}
       isWaitingForPlay={isWaitingForPlay}
       onClick={handleStart}
     >
@@ -145,7 +154,7 @@ function SplashScreen({ onComplete }) {
         isPlaying={isPlaying}
         loop
       >
-        <source src={newsVideo} type="video/mp4" />
+        <source src={videoSrc} type="video/mp4" />
         Your browser does not support the video tag.
       </Video>
     </SplashContainer>
