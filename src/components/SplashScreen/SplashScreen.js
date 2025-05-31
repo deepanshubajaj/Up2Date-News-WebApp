@@ -87,6 +87,7 @@ function SplashScreen({ onComplete }) {
 
   useEffect(() => {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    console.log('Detected mobile:', isMobile, 'UserAgent:', navigator.userAgent);
     setVideoSrc(isMobile ? newsVideoMobile : newsVideoDesktop);
   }, []);
 
