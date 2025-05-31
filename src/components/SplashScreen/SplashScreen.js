@@ -88,7 +88,7 @@ function SplashScreen({ onComplete }) {
   // Better mobile detection
   useLayoutEffect(() => {
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) &&
-                     ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0);
     console.log('Detected mobile:', isMobile, 'UserAgent:', navigator.userAgent);
     setVideoSrc(isMobile ? newsVideoMobile : newsVideoDesktop);
   }, []);
@@ -126,7 +126,13 @@ function SplashScreen({ onComplete }) {
       const video = document.getElementById('splashVideo');
       const audio = new Audio(newsAudio);
 
-      await Promise.all([video.play(), audio.play()]);
+      // Play video first (muted), then try audio
+      await video.play();
+
+      // Try to play audio after video starts
+      audio.play().catch(err => {
+        console.warn('Audio play failed, maybe blocked by browser:', err);
+      });
 
       setIsWaitingForPlay(false);
       setIsPlaying(true);
@@ -143,6 +149,7 @@ function SplashScreen({ onComplete }) {
     }
   };
 
+
   return (
     <SplashContainer
       isVisible={isVisible}
@@ -156,7 +163,7 @@ function SplashScreen({ onComplete }) {
         key={videoSrc} // force re-render when src changes
         id="splashVideo"
         playsInline
-        muted={false}
+        muted
         isPlaying={isPlaying}
         loop
       >
