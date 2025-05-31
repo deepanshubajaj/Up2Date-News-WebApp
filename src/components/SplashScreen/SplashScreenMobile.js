@@ -20,7 +20,7 @@ const SplashContainer = styled.div`
   display: ${({ isVisible }) => (isVisible ? "flex" : "none")};
   justify-content: center;
   align-items: center;
-  cursor: pointer;
+  cursor: ${({ isWaitingForPlay }) => (isWaitingForPlay ? "pointer" : "default")};
   flex-direction: column;
 `;
 
@@ -42,19 +42,31 @@ const GifImage = styled.img`
 
 function SplashScreenMobile({ onComplete }) {
   const [isVisible, setIsVisible] = useState(true);
+  const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
 
-  const handleStart = () => {
-    const audio = new Audio(newsAudio);
-    audio.play().catch((e) => console.error("Error playing audio:", e));
+  const handleStart = async () => {
+    if (!isWaitingForPlay) return;
 
-    setIsVisible(false);
-    if (onComplete) onComplete();
+    try {
+      const audio = new Audio(newsAudio);
+      await audio.play();
+
+      setIsWaitingForPlay(false);
+
+      setTimeout(() => {
+        setIsVisible(false);
+        audio.pause();
+        if (onComplete) onComplete();
+      }, 5000);
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    }
   };
 
   return (
-    <SplashContainer isVisible={isVisible} onClick={handleStart}>
+    <SplashContainer isVisible={isVisible} isWaitingForPlay={isWaitingForPlay} onClick={handleStart}>
       <GifImage src={phoneNewsGif} alt="Loading animation" />
-      <StartMessage>Tap anywhere to start</StartMessage>
+      {isWaitingForPlay && <StartMessage>Tap anywhere to start</StartMessage>}
     </SplashContainer>
   );
 }
