@@ -99,27 +99,15 @@ function SplashScreen({ onComplete }) {
 }, []);
 
 
-  useEffect(() => {
-    const video = document.getElementById('splashVideo');
-
-    const handleVideoEnd = () => {
-      setIsVisible(false);
-      if (onComplete) onComplete();
-    };
-
-    const handleVideoError = (e) => {
-      console.error('Video error:', e);
-      setError('Video error: ' + (e.message || 'Unknown error'));
-    };
-
-    video.addEventListener('ended', handleVideoEnd);
-    video.addEventListener('error', handleVideoError);
-
-    return () => {
-      video.removeEventListener('ended', handleVideoEnd);
-      video.removeEventListener('error', handleVideoError);
-    };
-  }, [onComplete]);
+ useEffect(() => {
+  const video = document.getElementById('splashVideo');
+  if (video) {
+    video.load(); // Force the video to reload the new source
+    if (isPlaying) {
+      video.play().catch(e => console.error('Error playing video:', e));
+    }
+  }
+}, [videoSource, isPlaying]);
 
   const handleStart = async () => {
     if (!isWaitingForPlay) return;
