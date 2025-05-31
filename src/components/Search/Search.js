@@ -35,8 +35,8 @@ function Search() {
     totalArticles === 0
       ? noFound
       : loading
-      ? searching
-      : `${capitaLize(searchQuery)} - News`;
+        ? searching
+        : `${capitaLize(searchQuery)} - News`;
 
   return (
     <>

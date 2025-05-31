@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Card } from "react-bootstrap";
 import Details from "./Details/Details";
-import { ReactComponent as ArrowIcon } from '../Images/ArrowIcon.svg'; 
+import { ReactComponent as ArrowIcon } from '../Images/ArrowIcon.svg';
 import ImageModal from "../ImageModal/ImageModal";
-import "./NewsItem.css"; 
+import "./NewsItem.css";
 
 function NewsItem(props) {
   const { imageUrl, alt, description, title, channel, published, urlNews } = props;
@@ -21,11 +21,11 @@ function NewsItem(props) {
   return (
     <>
       <Card className="card">
-        <Card.Img 
-          className="card-img" 
-          variant="top" 
-          src={imageUrl} 
-          alt={alt} 
+        <Card.Img
+          className="card-img"
+          variant="top"
+          src={imageUrl}
+          alt={alt}
           onClick={handleImageClick}
           style={{ cursor: 'pointer' }}
         />

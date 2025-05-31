@@ -11,7 +11,7 @@ export const SpinnerContainer = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
 `;
-  
+
 export const LoadingCircle = styled.div`
   width: 40px;
   height: 40px;
