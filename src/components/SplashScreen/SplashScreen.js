@@ -85,6 +85,7 @@ function SplashScreen({ onComplete }) {
 
   useEffect(() => {
   const updateVideoSource = () => {
+    console.log('window.innerWidth:', window.innerWidth);
     const isMobile = window.innerWidth <= 768;
     setVideoSource(isMobile ? newsVideoMobile : newsVideo);
   };
