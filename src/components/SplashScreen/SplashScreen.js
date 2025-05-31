@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { IoPlayCircleOutline } from "react-icons/io5";
 import newsVideo from '../../SplashScreenAssets/newsVideo.mp4';
 import newsAudio from '../../SplashScreenAssets/news_audio.mp3';
+import newsVideoMobile from '../../SplashScreenAssets/phone-news-video.mp4';
 
 const fadeInOut = keyframes`
   0% { opacity: 0; transform: translate(-50%, -50%) translateY(10px); }
@@ -80,6 +81,22 @@ function SplashScreen({ onComplete }) {
   const [isWaitingForPlay, setIsWaitingForPlay] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState(null);
+  const [videoSource, setVideoSource] = useState(newsVideo);
+
+  useEffect(() => {
+  const updateVideoSource = () => {
+    const isMobile = window.innerWidth <= 768;
+    setVideoSource(isMobile ? newsVideoMobile : newsVideo);
+  };
+
+  updateVideoSource();
+  window.addEventListener('resize', updateVideoSource);
+
+  return () => {
+    window.removeEventListener('resize', updateVideoSource);
+  };
+}, []);
+
 
   useEffect(() => {
     const video = document.getElementById('splashVideo');
@@ -145,7 +162,7 @@ function SplashScreen({ onComplete }) {
         isPlaying={isPlaying}
         loop
       >
-        <source src={newsVideo} type="video/mp4" />
+        <source src={videoSource} type="video/mp4" />
         Your browser does not support the video tag.
       </Video>
     </SplashContainer>
