@@ -125,7 +125,7 @@ axios.get(`https://gnews.io/api/v4/top-headlines?category=technology&lang=en&tok
 ## 🖼️ App Icon
 
 <p align="center">
-  <img src="ProjectOutputs/Snapshots/Icon.png" alt="Icon1" width="40%"  />
+  <img src="ProjectOutputs/Snapshots/Icon.png" alt="Icon1" width="30%"  />
 </p>
 
 <p align="center">
