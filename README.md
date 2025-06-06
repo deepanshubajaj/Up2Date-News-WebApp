@@ -1,5 +1,3 @@
-# Up2Date-News-WebApp
-Up2Date News WebApp
 <h1 align="center">📰 Up2Date News WebApp</h1>
 
 <p align="center">
