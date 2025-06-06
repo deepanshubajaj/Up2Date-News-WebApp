@@ -236,7 +236,7 @@ axios.get(`https://gnews.io/api/v4/top-headlines?category=technology&lang=en&tok
 
 Here’s a short video showcasing the app's functionality:
 
-[Watch the Working Demo](https://github.com/user-attachments/assets/928202a6-33a9-4238-b5bc-0296ab213eb9)
+[Watch the Working Demo](https://github.com/user-attachments/assets/abe6b86b-40ab-4711-84cb-4ce7fe1388a4)
 
 ##
 
